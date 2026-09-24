@@ -1,13 +1,14 @@
-import AddButton from '@/components/gymDetails/AddButton';
-import SaveButton from '@/components/gymDetails/SaveButton';
-import { IWorkout } from '@/types/gymTypes';
-import Image from 'next/image';
-import React from 'react';
+import AddButton from "@/components/gymDetails/AddButton";
+import SaveButton from "@/components/gymDetails/SaveButton";
+// import GymCard from "@/components/shared/GymCard";
+import { IWorkout } from "@/types/gymTypes";
+import Image from "next/image";
+import { notFound } from "next/navigation";
 
 interface IGymDetailsPageProps {
-    params: Promise<{
-        id: string;
-    }>;
+  params: Promise<{
+    id: string;
+  }>;
 }
 
 const specRows = (w: IWorkout) => [
@@ -20,26 +21,41 @@ const specRows = (w: IWorkout) => [
   { label: "RATING", value: w.rating },
 ];
 
-const getGymData = async () => {
+const getGymData = async (): Promise<IWorkout[]> => {
+  const res = await fetch(
+    "https://api.abcz.workers.dev/api/fitlog",
+    {
+      cache: "no-store",
+    }
+  );
 
-    const res = await fetch("https://api.abcz.workers.dev/api/fitlog")
-    const data = await res.json();
-    return data;
+  if (!res.ok) {
+    throw new Error("Failed to fetch workout data");
+  }
 
-}
+  const data: IWorkout[] = await res.json();
 
-const GymDetailsPage = async ({ params }: IGymDetailsPageProps) => {
+  return data;
+};
 
-    const { id } = await params;
-    const GymData = await getGymData();
+const GymDetailsPage = async ({
+  params,
+}: IGymDetailsPageProps) => {
+  const { id } = await params;
 
-    const gym = GymData.find((gym: IWorkout) => String(id) === String(gym.id)
-    ) as IWorkout;
-    console.log(gym, "Gym Data")
-    return (
-           <section className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-2 gap-10">
-      
-      <div className="relative h-72 sm:h-96 lg:h-full lg:min-h-125 rounded-2xl overflow-hidden bg-[#151619]">
+  const gymData = await getGymData();
+
+  const gym = gymData.find(
+    (item) => String(item.id) === id
+  );
+
+  if (!gym) {
+    notFound();
+  }
+
+  return (
+    <section className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-12 lg:grid-cols-2">
+      <div className="relative h-72 overflow-hidden rounded-2xl bg-[#151619] sm:h-96 lg:h-full lg:min-h-120">
         <Image
           src={gym.image}
           alt={gym.name}
@@ -50,27 +66,29 @@ const GymDetailsPage = async ({ params }: IGymDetailsPageProps) => {
         />
       </div>
 
-      
       <div>
-        <h1 className="text-white font-extrabold text-3xl sm:text-4xl tracking-tight">
+
+        <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
           {gym.name}
         </h1>
-        <p className="text-gray-400 text-sm mt-3 max-w-md">
+
+        <p className="mt-3 max-w-md text-sm text-gray-400">
           {gym.description}
         </p>
 
-        <div className="flex flex-wrap gap-2 mt-4">
+      
+        <div className="mt-4 flex flex-wrap gap-2">
           {gym.muscleGroups.map((tag) => (
             <span
               key={tag}
-              className="bg-lime-400 text-black text-xs font-extrabold px-3 py-1 rounded-full"
+              className="rounded-full bg-[#C2F800] px-3 py-1 text-xs font-extrabold text-black"
             >
               {tag}
             </span>
           ))}
         </div>
 
-        <div className="mt-6 rounded-xl border border-white/10 overflow-hidden">
+        <div className="mt-6 overflow-hidden rounded-xl border border-white/10">
           {specRows(gym).map((row, i) => (
             <div
               key={row.label}
@@ -80,39 +98,47 @@ const GymDetailsPage = async ({ params }: IGymDetailsPageProps) => {
                   : ""
               }`}
             >
-              <span className="text-gray-500 text-xs font-bold tracking-wide">
+              <span className="text-xs font-bold tracking-wide text-gray-500">
                 {row.label}
               </span>
-              <span className="text-white font-semibold">{row.value}</span>
+
+              <span className="font-semibold text-white">
+                {row.value}
+              </span>
             </div>
           ))}
         </div>
 
-
-       
         <div className="mt-8">
-          <h2 className="text-white font-extrabold text-sm tracking-wide mb-3">
+          <h2 className="mb-3 text-sm font-extrabold tracking-wide text-white">
             INSTRUCTIONS
           </h2>
-          <ol className="space-y-2">
+
+          <ol className="space-y-3">
             {gym.instructions.map((step, i) => (
-              <li key={i} className="flex gap-2 text-sm text-gray-400">
-                <span className="text-gray-500 shrink-0">{i + 1}.</span>
+              <li
+                key={i}
+                className="flex gap-3 text-sm text-gray-400"
+              >
+                <span className="shrink-0 font-semibold text-[#C2F800]">
+                  {i + 1}.
+                </span>
+
                 <span>{step}</span>
               </li>
             ))}
           </ol>
         </div>
 
-      
-        <div className="flex flex-col sm:flex-row gap-3 mt-8">
-          <AddButton gym={gym}></AddButton>
-          
-          <SaveButton gym={gym}></SaveButton>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <AddButton gym={gym} />
+          <SaveButton gym={gym} />
         </div>
+       
+
       </div>
     </section>
-    );
+  );
 };
 
 export default GymDetailsPage;

@@ -34,7 +34,7 @@ const Banner = () => {
                 text-white
             "
           >
-    
+
             TRAIN WITH INTENT. LOG
             <br />
             EVERY SET.
@@ -50,8 +50,8 @@ const Banner = () => {
               text-[#9297A3]
             "
           >
-            FitLog is a dark, no-nonsense gym companion: pick a lift, lock it
-            into today plan, and watch the week work add up.
+            FitLog is a dark, no-nonsense gym companion: pick a lift, lock it into
+            today&apos;s plan, and watch the week&apos;s work add up.
           </p>
 
           <button

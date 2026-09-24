@@ -3,9 +3,13 @@
 import { PlanContext } from '@/context/gymContext';
 import { IWorkout } from '@/types/gymTypes';
 import { useContext } from 'react';
+import { toast } from 'react-toastify';
 
 const AddButton = ({ gym }: { gym: IWorkout }) => {
-  const context = useContext(PlanContext);
+  const context = useContext(PlanContext) as {
+    plan: IWorkout[];
+    setPlan: React.Dispatch<React.SetStateAction<IWorkout[]>>;
+  } | null;
 
   if (!context) {
     throw new Error('AddButton must be used within a PlanProvider');
@@ -14,13 +18,24 @@ const AddButton = ({ gym }: { gym: IWorkout }) => {
   const { plan, setPlan } = context;
 
   const handleAddButton = () => {
-    setPlan([...plan, gym]);
-    console.log(gym);
-  };
+  if (plan.some((item) => item.id === gym.id)) {
+    toast.info("This workout is already in today's plan!");
+    return;
+  }
+
+  if (plan.length >= 5) {
+    toast.warning("Today's plan can contain only 5 workouts.");
+    return;
+  }
+
+  setPlan((prev) => [...prev, gym]);
+
+  toast.success(`${gym.name} added to today's plan`);
+};
 
   return (
-    <button className="btn btn-primary flex-1" onClick={handleAddButton}>
-      add today plan
+    <button className="btn bg-lime-400 flex-1" onClick={handleAddButton}>
+      Add to today&apos;s plan
     </button>
   );
 };
