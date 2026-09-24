@@ -79,7 +79,7 @@ const PlanListCard = ({
 
       <div className="flex flex-wrap gap-2">
 
-      
+    
         <Link
           href={`/workouts/${gym.id}`}
           className="rounded-full border border-white/10 px-3 py-2 text-xs font-bold text-white transition hover:bg-white/10"
