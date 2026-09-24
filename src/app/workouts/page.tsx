@@ -1,6 +1,8 @@
-import Image from 'next/image';
+// import Image from 'next/image';
 import React from 'react';
-import Logo from "@/assets/banner.png"
+// import Logo from "@/assets/banner.png"
+import GymCard from '@/components/shared/GymCard';
+import { IWorkout } from '@/types/gymTypes';
 
 const getGymData = async () => {
 
@@ -15,28 +17,21 @@ const WorkOutsPage = async () => {
     const gymData = await getGymData();
 
     return (
+ <section className="bg-black px-6 py-16">
+            <div className="max-w-6xl mx-auto">
+                <h2 className="text-white text-3xl font-extrabold">THE LIBRARY</h2>
+                <p className="text-gray-500 text-sm mt-2 mb-8">Twelve lifts covering every major muscle group.</p>
 
-        
-        <div className="card bg-base-100 w-96 shadow-sm">
-            <figure>
-                <Image
-                    src={Logo}
-                    width={200}
-                    height={200}
-                    alt="Shoes" />
-            </figure>
-            <div className="card-body">
-                <h2 className="card-title">
-                    Card Title
-                    <div className="badge badge-secondary">NEW</div>
-                </h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div className="card-actions justify-end">
-                    <div className="badge badge-outline">Fashion</div>
-                    <div className="badge badge-outline">Products</div>
-                </div>
             </div>
-        </div>
+            <div className="grid grid-cols-3 gap-4">
+               {gymData.map((gym: IWorkout, ind:number) =>  {
+           return <GymCard key={ind} gym={gym}></GymCard>
+       
+   } )}
+            </div>
+
+        </section>
+
     );
 };
 
