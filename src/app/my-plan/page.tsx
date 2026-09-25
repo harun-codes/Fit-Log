@@ -14,6 +14,7 @@ const MyPlanPage = () => {
     }
 
     const { plan, saved } = context;
+    const [activeTab, setActiveTab] = useState<"plan" | "saved">("plan");
 
     const [sortBy, setSortBy] = useState<
         "duration" | "calories" | "rating"
@@ -40,15 +41,10 @@ const MyPlanPage = () => {
     const sortedPlan = sortItems(plan);
     const sortedSaved = sortItems(saved);
 
-    const totalMinutes = plan.reduce(
-        (total, workout) => total + workout.duration,
-        0
-    );
+    const activeWorkouts = activeTab === "plan" ? sortedPlan : sortedSaved;
 
-    const totalCalories = plan.reduce(
-        (total, workout) => total + workout.caloriesBurned,
-        0
-    );
+  const totalMinutes = activeWorkouts.reduce((sum, item) => sum + item.duration, 0);
+  const totalCalories = activeWorkouts.reduce((sum, item) => sum + item.caloriesBurned, 0)
 
     return (
         <main className="min-h-screen bg-black px-4 py-10 text-white">
@@ -72,7 +68,7 @@ const MyPlanPage = () => {
                         </p>
 
                         <p className="mt-2 text-3xl text-lime-400 font-extrabold">
-                            {plan.length}
+                            {activeWorkouts.length}
                         </p>
                     </div>
 
@@ -119,7 +115,7 @@ const MyPlanPage = () => {
                 </div>
 
                 <div className="tabs tabs-lift">
-                    <input type="radio" name="my_tabs_3" className="tab" aria-label="Today's Plan" defaultChecked />
+                    <input type="radio" name="my_tabs_3" className="tab" aria-label="Today's Plan" defaultChecked onChange={() => setActiveTab("plan")} />
                     <div className="tab-content bg-base-100 border-base-300 p-6"><h2 className="mb-4 text-xl font-bold">
                         Today&apos;s Plan
                     </h2>
@@ -138,7 +134,7 @@ const MyPlanPage = () => {
                             </div>
                         )}</div>
 
-                    <input type="radio" name="my_tabs_3" className="tab" aria-label="Saved" />
+                    <input type="radio" name="my_tabs_3" className="tab" aria-label="Saved" onChange={() => setActiveTab("saved")} />
                     <div className="tab-content bg-base-100 border-base-300 p-6">  <h2 className="mb-4 text-xl font-bold">
                         Saved
                     </h2>
